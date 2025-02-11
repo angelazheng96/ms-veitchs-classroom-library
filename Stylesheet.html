@@ -1,0 +1,281 @@
+<!-- Angela and Jessica worked on this file together -->
+
+<!-- This CSS package applies Google styling; it should always be included. -->
+<link
+  rel="stylesheet"
+  href="https://ssl.gstatic.com/docs/script/css/add-ons.css"
+/>
+
+<!-- gets Merriweather font -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap"
+  rel="stylesheet"
+/>
+
+<style>
+  /* General */
+
+  .merriweather-regular {
+    font-family: "Merriweather", serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  :root {
+    --light-cream: #fffdfb;
+    --dark-cream: #c2b9b0;
+    --brown: #524547;
+    --green: #658170;
+    --turquoise: #05606d;
+    --blue: #093761;
+    --purple: #54214c;
+    --pink: #c995ab;
+  }
+
+  * {
+    font-family: "Times New Roman", serif;
+    font-size: 1.1em;
+    color: var(--brown);
+  }
+
+  body {
+    background-color: var(--light-cream);
+  }
+
+  .container {
+    margin: 0em 20em;
+  }
+
+  /* navbar */
+  .navbar-nav {
+    padding: 25px;
+    text-align: center;
+    color: black;
+    font-size: 20px;
+    font-family: "Times New Roman", serif;
+  }
+
+  /* navbar link */
+  .navbar-nav a {
+    color: black;
+    padding: 12px 16px;
+    display: inline-block;
+  }
+
+  .header {
+    padding: 60px;
+    text-align: center;
+    background: var(--pink);
+    background-image: url(https://drive.google.com/thumbnail?id=1pkJ4vPu1slamMIKbR7vXCi3lp-l7mheK);
+    background-size: cover;
+    background-blend-mode: multiply;
+  }
+
+  /* header text */
+  .header-text {
+    color: white;
+    font-size: 2.5em;
+    font-family: Merriweather, serif;
+  }
+
+  /* Home Page */
+
+  .welcome-message {
+    text-align: center;
+    margin: 5em 0em;
+    font-size: 1.25em;
+    line-height: 1.5em;
+  }
+
+  /* linkedin links */
+  a {
+    color: black;
+    background-color: transparent;
+    text-decoration: none;
+    font-size: 1em;
+  }
+
+  footer {
+    background-color: var(--pink);
+    text-align: center;
+    padding: 5px;
+  }
+
+  .footer-text {
+    color: black;
+    line-height: 1.5em;
+  }
+
+  /* linkedin names text */
+  #angela {
+    color: var(--purple);
+  }
+
+  #jessica {
+    color: var(--blue);
+  }
+
+  /* Library Page */
+
+  .library-title {
+    font-size: 1.5em;
+  }
+
+  /* search input box */
+  #search-input {
+    height: 28px;
+    color: black;
+    font-family: "Times New Roman", serif;
+  }
+
+  #searchBTN {
+    color: black;
+    font-family: "Times New Roman", serif;
+  }
+
+  #clear-filters {
+    display: none;
+    float: right;
+  }
+
+  /* dropdown button */
+  .dropbtn {
+    color: black;
+    font-family: "Times New Roman", serif;
+  }
+
+  /* dropdown position */
+  .dropdown {
+    display: inline-block;
+    float: right;
+  }
+
+  /* dropdown */
+  .dropdown-content {
+    background-color: white;
+    display: none;
+    position: absolute;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+  }
+
+  /* dropdown buttons */
+  .dropdown-content button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: black;
+    font-family: "Times New Roman", serif;
+  }
+
+  /* display options when hovering */
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+
+  .dropdown-content:hover .dropdown-shelves-content {
+    display: block;
+  }
+
+  .error {
+    color: #ff0000;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  #loading {
+    padding-top: 30px;
+    font-size: 1.5em;
+    margin: 0.5em 0em 0em 0em;
+  }
+
+  #no-results {
+    font-size: 1.25em;
+    margin: 0.5em 0em 0em 0em;
+  }
+
+  /* Library */
+
+  #library {
+    padding-top: 30px;
+  }
+
+  /* https://codedamn.com/news/frontend/how-to-put-image-and-text-side-by-side-in-html */
+  .book {
+    display: flex;
+    justify-content: left;
+  }
+
+  .book-info {
+    display: block;
+    padding-left: 30px;
+  }
+
+  /* https://pineco.de/snippets/disable-flexbox-image-stretch/ */
+  img {
+    border-radius: 8px;
+    align-self: flex-start;
+  }
+
+  .book-tag {
+    margin: 0em 0em 0.5em 0em;
+    line-height: 1.15em;
+  }
+
+  .book-title {
+    font-size: 1.5em;
+    color: var(--blue);
+    font-weight: bold;
+    margin: 0.5em 0em 0em 0em;
+  }
+
+  .book-author {
+    font-size: 1.2em;
+    color: var(--purple);
+    margin: 0em 0em 0.75em 0em;
+  }
+
+  .book-genre {
+    font-size: 1em;
+    margin: 0em;
+  }
+
+  .book-shelf {
+    font-size: 1em;
+    margin: 0em;
+  }
+
+  .book-link {
+    font-size: 1em;
+    color: var(--turquoise);
+    margin: 0em 0em 0.5em 0em;
+  }
+
+  .book-description-button {
+    font-family: "Times New Roman", serif;
+    font-size: 0.9em;
+    font-weight: normal;
+    display: inline-block;
+    text-align: center;
+    padding: 5px;
+    line-height: 0px;
+  }
+
+  .book-description {
+    font-size: 1em;
+    margin: 0.5em 0em;
+    line-height: 1.15em;
+  }
+
+  /* horizontal lines */
+  .hr {
+    color: var(--dark-cream);
+    border-style: solid;
+    size: 1px;
+    margin: 1em 0em;
+  }
+</style>

@@ -1,0 +1,422 @@
+<!-- Angela worked primarily on this file unless otherwise commented -->
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+  /**
+   * Run initializations on web app load.
+   */
+  $(function () {
+    displayAllBooks();
+    showGenres();
+    showShelves();
+  });
+
+  // use the search bar
+  function searchBooks() {
+    // don't do anything if something else is loading
+    if (document.getElementById("loading").hidden == false) {
+      return;
+    }
+
+    let searchedBook = document.getElementById("search-input").value;
+
+    // if the search box has no text, then gets all books
+    if (searchedBook == "") {
+      document.getElementById("all-books").hidden = false;
+      document.getElementById("search-title").hidden = true;
+      document.getElementById("filter-genre").hidden = true;
+      document.getElementById("filter-shelf").hidden = true;
+
+      document.getElementById("search-title").innerHTML = "Search Results: ";
+      document.getElementById("filter-genre").innerHTML = "Filter by Genre: ";
+      document.getElementById("filter-shelf").innerHTML = "Filter by Shelf: ";
+
+      document.getElementById("clear-filters").style.display = "none";
+
+      clearLibrary();
+      showLoading();
+
+      google.script.run
+        .withSuccessHandler(function (bookArray) {
+          displayBooks(bookArray);
+        })
+        .getAllBooks();
+
+      // otherwise, searches for the specified book
+    } else {
+      document.getElementById("all-books").hidden = true;
+      document.getElementById("search-title").hidden = false;
+      document.getElementById("filter-genre").hidden = true;
+      document.getElementById("filter-shelf").hidden = true;
+
+      document.getElementById("search-title").innerHTML =
+        "Search Results: " + searchedBook;
+      document.getElementById("filter-genre").innerHTML = "Filter by Genre: ";
+      document.getElementById("filter-shelf").innerHTML = "Filter by Shelf: ";
+
+      document.getElementById("clear-filters").style.display = "none";
+
+      clearLibrary();
+      showLoading();
+
+      google.script.run
+        .withSuccessHandler(function (bookArray) {
+          displayBooks(bookArray);
+        })
+        .getSearchedBooks(searchedBook);
+    }
+  }
+
+  // adds genre names to filter dropdown
+  function showGenres() {
+    google.script.run
+      .withSuccessHandler(function (genresArr) {
+        let content = `<div class="dropdown-genres-content">`;
+
+        for (let i = 0; i < genresArr.length; i++) {
+          content += `<button class="dropdown-genre" onclick="filterByGenre(this)" type="button">${genresArr[i]}</button>`;
+        }
+
+        content += `</div>`;
+
+        $("#dropdown-genres").append(content);
+      })
+      .getGenres();
+  }
+
+  // adds shelf names to filter dropdown
+  function showShelves() {
+    google.script.run
+      .withSuccessHandler(function (shelfNames) {
+        let content = `<div class="dropdown-shelves-content">`;
+
+        for (let i = 0; i < shelfNames.length; i++) {
+          content += `<button class="dropdown-shelf" onclick="filterByShelf(this)" type="button">${shelfNames[i]}</button>`;
+        }
+
+        content += `</div>`;
+
+        $("#dropdown-shelves").append(content);
+      })
+      .getShelfNames();
+  }
+
+  // gets book info from the ones that are currently displayed on website
+  // returns array of book objects
+  function getBooksFromWebsite() {
+    // gets NodeList of elements with the "book" class within the "library" class
+    // https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll
+    let bookElements = document.querySelectorAll(".library .book");
+    let bookArray = [];
+
+    // loops through book elements
+    for (let i = 0; i < bookElements.length; i++) {
+      let bookElement = bookElements[i];
+
+      // gets all the book information from the various HTML elements
+      let book = {
+        author: bookElement
+          .getElementsByClassName("book-author")[0]
+          .innerHTML.substring(3),
+        title: bookElement.getElementsByClassName("book-title")[0].innerHTML,
+        description:
+          bookElement.getElementsByClassName("book-description")[0].innerHTML,
+        genre: bookElement
+          .getElementsByClassName("book-genre")[0]
+          .innerHTML.substring(8)
+          .split(", "),
+        shelf: bookElement
+          .getElementsByClassName("book-shelf")[0]
+          .innerHTML.substring(7),
+        link: bookElement.getElementsByClassName("book-url")[0].href,
+        cover: bookElement
+          .getElementsByClassName("book-cover")[0]
+          .src.split("=")
+          .pop(),
+      };
+
+      // pushes the current book object to the array
+      bookArray.push(book);
+    }
+
+    return bookArray;
+  }
+
+  // gets all books that contain the genre
+  // returns array of book objects
+  function getBooksByGenre(genreName) {
+    let booksArray = getBooksFromWebsite();
+    let newBooks = [];
+
+    // loops through book array
+    for (let b = 0; b < booksArray.length; b++) {
+      // checks if the book contains this genre
+      if (booksArray[b].genre.includes(genreName)) {
+        // adds this book to the array
+        newBooks.push(booksArray[b]);
+      }
+    }
+
+    return newBooks;
+  }
+
+  // filters books by the genre(s) selected from the dropdown
+  function filterByGenre(genreButton) {
+    // don't do anything if something else is loading
+    if (document.getElementById("loading").hidden == false) {
+      return;
+    }
+
+    // gets the name of the genre that just got clicked
+    let genreName = genreButton.innerText;
+
+    // gets books
+    let bookArray = getBooksByGenre(genreName);
+
+    // changes title for the library at top of page
+    document.getElementById("all-books").hidden = true;
+    document.getElementById("filter-genre").hidden = false;
+
+    let currentTitle = document.getElementById("filter-genre").innerHTML;
+
+    if (currentTitle != "Filter by Genre: ") {
+      genreName = ", " + genreName;
+    }
+    document.getElementById("filter-genre").innerHTML =
+      currentTitle + genreName;
+
+    clearLibrary(); // clears library
+    showLoading(); // shows loading message
+
+    // shows clear filters button
+    document.getElementById("clear-filters").style.display = "inline-block";
+
+    displayBooks(bookArray);
+  }
+
+  // gets books by shelf name
+  function getBooksByShelfName(shelfName) {
+    let bookArray = getBooksFromWebsite();
+    let newBooks = [];
+
+    for (let b = 0; b < bookArray.length; b++) {
+      if (bookArray[b].shelf == shelfName) {
+        newBooks.push(bookArray[b]);
+      }
+    }
+
+    return newBooks;
+  }
+
+  // filters books by the shelf name selected from the dropdown
+  function filterByShelf(shelfButton) {
+    // don't do anything if something else is loading
+    if (document.getElementById("loading").hidden == false) {
+      return;
+    }
+
+    // gets the name of the genre that just got clicked
+    let shelfName = shelfButton.innerText;
+
+    // gets books
+    let bookArray = getBooksByShelfName(shelfName);
+
+    // changes title for the library at top of page
+    document.getElementById("all-books").hidden = true;
+    document.getElementById("filter-shelf").hidden = false;
+
+    let currentTitle = document.getElementById("filter-shelf").innerHTML;
+
+    if (currentTitle != "Filter by Shelf: ") {
+      shelfName = ", " + shelfName;
+    }
+    document.getElementById("filter-shelf").innerHTML =
+      currentTitle + shelfName;
+
+    clearLibrary(); // clears library
+    showLoading(); // shows loading message
+
+    // shows clear filters button
+    document.getElementById("clear-filters").style.display = "inline-block";
+
+    displayBooks(bookArray);
+  }
+
+  // clears filters by getting all books and displaying them
+  function clearFilters() {
+    // don't do anything if something else is loading
+    if (document.getElementById("loading").hidden == false) {
+      return;
+    }
+
+    // displays books that are in the search bar
+    searchBooks();
+  }
+
+  // displays sorted books based on the specified compare method
+  function sortBooks(compareMethod) {
+    // don't do anything if something else is loading
+    if (document.getElementById("loading").hidden == false) {
+      return;
+    }
+
+    let bookArray = getBooksFromWebsite();
+
+    clearLibrary();
+    showLoading();
+
+    // source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+    bookArray.sort(compareMethod);
+    displayBooks(bookArray);
+  }
+
+  // returns difference in authors as compare method for sorting
+  function authorAZ(bookA, bookB) {
+    // if author is the same, returns difference in titles
+    if (bookA.author == bookB.author) {
+      return bookA.title.localeCompare(bookB.title);
+    }
+
+    // otherwise, return the difference in authors
+    return bookA.author.localeCompare(bookB.author);
+  }
+
+  // returns difference in authors as compare method for sorting
+  function authorZA(bookA, bookB) {
+    // if author is the same, returns difference in titles
+    if (bookA.author == bookB.author) {
+      return bookB.title.localeCompare(bookA.title);
+    }
+
+    // otherwise, return the difference in authors
+    return bookB.author.localeCompare(bookA.author);
+  }
+
+  // returns difference in titles as compare method for sorting
+  function titleAZ(bookA, bookB) {
+    // if title is the same, returns difference in authors
+    if (bookA.title == bookB.title) {
+      return bookA.author.localeCompare(bookB.author);
+    }
+
+    // otherwise, return the difference in authors
+    return bookA.title.localeCompare(bookB.title);
+  }
+
+  // returns difference in titles as compare method for sorting
+  function titleZA(bookA, bookB) {
+    // if title is the same, returns difference in authors
+    if (bookA.title == bookB.title) {
+      return bookB.author.localeCompare(bookA.author);
+    }
+
+    // otherwise, return the difference in authors
+    return bookB.title.localeCompare(bookA.title);
+  }
+
+  // shows loading message
+  function showLoading() {
+    document.getElementById("loading").hidden = false;
+  }
+
+  // hides loading message
+  function hideLoading() {
+    document.getElementById("loading").hidden = true;
+  }
+
+  // clears library
+  function clearLibrary() {
+    document.getElementById("library").innerHTML = "";
+    $("#library").append(
+      `<div id="no-results" hidden="hidden">No books found</div>`
+    );
+  }
+
+  // displays all books from spreadsheet
+  function displayAllBooks() {
+    google.script.run
+      .withSuccessHandler(function (bookArray) {
+        displayBooks(bookArray);
+      })
+      .getAllBooks();
+
+    document.getElementById("all-books").hidden = false;
+    document.getElementById("filter-genre").hidden = true;
+    document.getElementById("filter-shelf").hidden = true;
+
+    document.getElementById("filter-genre").innerHTML = "Filter by Genre: ";
+    document.getElementById("filter-shelf").innerHTML = "Filter by Shelf: ";
+  }
+
+  // adds books from an array of books to the HTML page
+  function displayBooks(bookArray) {
+    // clears the current books in the library
+    clearLibrary();
+
+    if (bookArray.length == 0) {
+      document.getElementById("no-results").hidden = false;
+      hideLoading();
+      return;
+    }
+
+    displayBook(bookArray[0]);
+
+    for (let i = 1; i < bookArray.length; i++) {
+      addHorizontalLine();
+      displayBook(bookArray[i]);
+    }
+
+    document.getElementById("no-results").hidden = true;
+    hideLoading();
+  }
+
+  // adds book info from object to HTML page
+  // Jessica - book covers
+  // Angela - the rest
+  function displayBook(book) {
+    let content = `<div class="book">
+      <img class="book-cover" src="https://drive.google.com/thumbnail?id=${
+        book.cover
+      }" alt="Book Cover">
+      <div class="book-info">
+        <div class="book-tag book-title">${book.title}</div>
+        <div class="book-tag book-author">by ${book.author}</div>
+        <div class="book-tag book-genre">Genres: ${book.genre.join(", ")}</div>
+        <div class="book-tag book-shelf">Shelf: ${book.shelf}</div>
+        <div class="book-tag book-link"><a href=${
+          book.link
+        } class="book-link book-url" target="_blank">Goodreads</a></div>
+        <div><button class="button book-description-button" onclick="toggleDescription(this.parentElement.parentElement)" type="button">Show Description</
+        button></div>
+        <div class="book-tag book-description" hidden="hidden">${
+          book.description
+        }</div>
+      </div>
+    </div>`;
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/Element/append
+    $("#library").append(content);
+  }
+
+  // when the "Show Description" or "Hide Description" button is clicked, the description is either shown or hidden
+  function toggleDescription(book) {
+    // code source:
+    // https://stackoverflow.com/questions/4825295/onclick-to-get-the-id-of-the-clicked-button
+    // https://medium.com/@harshitgambhir88/how-to-get-html-elements-using-javascript-838a05158413
+    let description = book.querySelector(".book-description");
+    let button = book.querySelector(".book-description-button");
+
+    if (description.hidden == true) {
+      description.hidden = false;
+      button.innerHTML = "Hide Description";
+    } else {
+      description.hidden = true;
+      button.innerHTML = "Show Description";
+    }
+  }
+
+  // adds horizontal line to the HTML page
+  function addHorizontalLine() {
+    $("#library").append(`<hr class="hr" />`);
+  }
+</script>

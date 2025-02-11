@@ -1,0 +1,67 @@
+<!-- Jessica and Angela both worked on this file -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top" />
+    <!-- connects to CSS -->
+    <?!= include('Stylesheet'); ?>
+  </head>
+  <body>
+    <!-- displays nav bar -->
+    {{NAVBAR}}
+    <div class="header">
+      <h1 class="header-text">Ms. Veitch’s Classroom Library</h1>
+    </div>
+
+    <div class="container">
+      <h2 id="all-books" class="library-title">All Books</h2>
+      <h2 id="filter-genre" class="library-title" hidden="hidden">
+        Filter by Genre:
+      </h2>
+      <h2 id="filter-shelf" class="library-title" hidden="hidden">
+        Filter by Shelf:
+      </h2>
+      <!-- show search results -->
+      <h2 id="search-title" class="library-title" hidden="hidden">
+        Search Results:
+      </h2>
+
+      <div id="library-menu">
+        <!-- search books -->
+        <input type="text" id="search-input" />
+        <button id="searchBTN" onclick="searchBooks()">Search</button>
+
+        <!-- Dropdown menu code from: https://www.w3schools.com/howto/howto_css_dropdown.asp -->
+        <div class="dropdown">
+          <!-- sorting -->
+          <button class="dropbtn" data-inline="true">Sort by...</button>
+          <div class="dropdown-content">
+            <button onclick="sortBooks(authorAZ)">Author A-Z</button>
+            <button onclick="sortBooks(authorZA)">Author Z-A</button>
+            <button onclick="sortBooks(titleAZ)">Title A-Z</button>
+            <button onclick="sortBooks(titleZA)">Title Z-A</button>
+          </div>
+        </div>
+
+        <div class="dropdown">
+          <button class="dropbtn" data-inline="true">Filter by...</button>
+          <div class="dropdown-content">
+            <button>Genre</button>
+            <div id="dropdown-genres"></div>
+            <button>Shelf</button>
+            <div id="dropdown-shelves"></div>
+          </div>
+        </div>
+
+        <button id="clear-filters" class="dropbtn" onclick="clearFilters()">
+          Clear Filters
+        </button>
+      </div>
+
+      <div id="loading">Loading...</div>
+      <div id="library" class="library"></div>
+    </div>
+    <?!= include('JavaScript'); ?>
+  </body>
+</html>
