@@ -1,4 +1,4 @@
-# MsVeitchsClassroomLibrary
+# Ms Veitch's Classroom Library
 
 This repository contains the code for our ICS4U (Computer Science) Summative Project, completed in June 2024 with [Jessica Tao](https://github.com/jetao7).
 
